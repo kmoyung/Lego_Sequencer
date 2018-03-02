@@ -16,20 +16,20 @@
 int redFrequency = 0;
 int greenFrequency = 0;
 int blueFrequency = 0;
-
+bool debug = false;
 // Stores the red. green and blue colors
 
 int redColor = 0;
 int greenColor = 0;
 int blueColor = 0;
 
-int inc = 500;
-int maxTotalCount = 10;
+int inc = 50;
+int maxTotalCount = 20;
 int timer = millis();
 int next = timer + inc;
 bool readyToRead = false;
 
-int count = 0;
+int count = maxTotalCount;
 
 int countBlue = 0;
 int countRed = 0;
@@ -37,7 +37,8 @@ int countGreen = 0;
 int countYellow = 0;
 
 int maxCount = 0;
-String maxColor = "Undetermined";
+String maxColor = "U";
+String currSeq = "";
 
 void setup() {
   // Setting the outputs
@@ -118,83 +119,103 @@ void loop() {
 
   if (count >= maxTotalCount) {
 
-    
-    
-    Serial.println("The Block Color was " + maxColor);
+    //Serial.println("The Block Color was " + maxColor);
+    Serial.println(maxColor);
+    currSeq = currSeq + maxColor;
+    //Serial.println(currSeq);
     //clear input so extra spaces in buffer don't cause it to start
     while(Serial.available() > 0) { Serial.read(); }
     
-    Serial.println("Insert Next Block and press SPACE to continue");
+    //Serial.println("Insert Next Block and press SPACE to continue");
     //wait for input
     while (Serial.available() == 0) {}
     
     char key = Serial.read();
-    if ( key == ' ' || key == '\n') {
+    //if (key == 'c') {
+      //count = 0;
+      //currSeq = "";
+    //}
+    
+    if ( key == ' ') {
         count = 0;
-        Serial.println("I got the message");
+        //Serial.println("I got the message");
         
     }
     else{
-      Serial.println("I'm sorry I didn't catch that");
-      Serial.print("<");
-      Serial.print(key);
-      Serial.print(">");
+      //Serial.println("I'm sorry I didn't catch that");
+      //Serial.print("<");
+      //Serial.print(key);
+      //Serial.print(">");
     }
     countBlue = 0;
     countRed = 0;
     countGreen = 0;
     countYellow = 0;
-    maxColor = "Undetermined";
+    maxColor = "U";
     maxCount = 0;
-    next = timer +inc;
+    next = millis();
+    //Serial.println(timer);
+    //Serial.println(next);
     //Serial.println("Insert Next Block and press SPACE to continue");
-    Serial.println("Looking For Colors"); 
+    //Serial.println("Looking For Colors"); 
   }
   else if (timer >= next) {
     next = timer + inc;
     count++;
+    //Serial.println(timer);
+    //Serial.println(next);
+    //Serial.println("ready");
     readyToRead = true;
     
     
   }
   if (readyToRead && redFrequency > 70 &&  greenFrequency < 100 && greenFrequency > 50 && blueFrequency >= 26) {
-    Serial.println("Green");
+    if (debug) {
+      Serial.println("Green");
+    }
     countGreen++;
 
     if (countGreen > maxCount) {
       maxCount = countGreen;
-      maxColor = "Green";
+      maxColor = "A";
     }
   }
 
   else if (readyToRead && redFrequency > 70 &&  greenFrequency < 90 && greenFrequency > 50 && blueFrequency <26) {
-    Serial.println("Blue");
+    if (debug) {
+      Serial.println("Blue");
+    }
     countBlue++;
     if (countBlue > maxCount) {
       maxCount = countBlue;
-      maxColor = "Blue";
+      maxColor = "T";
     }
   }
 
   else if (readyToRead && redFrequency < 40 &&  greenFrequency > 95 && blueFrequency < 26) {
-    Serial.println("Red");
+    if (debug) {
+      Serial.println("Red");
+    }
     countRed++;
     if (countRed > maxCount) {
       maxCount = countRed;
-      maxColor = "Red";
+      maxColor = "C";
     }
   } 
 
   else if (readyToRead && redFrequency < 26 &&  greenFrequency < 40 && blueFrequency < 20) {
-    Serial.println("Yellow");
+    if (debug) {
+      Serial.println("Yellow");
+    }
     countYellow++;
     if (countYellow > maxCount) {
       maxCount = countYellow;
-      maxColor = "Yellow";
+      maxColor = "G";
     }
   }
 
   else if (readyToRead) {
+    if (debug) {
     Serial.print("Color Not Found, ");
     Serial.print("R = ");
     Serial.print(redFrequency);
@@ -202,8 +223,11 @@ void loop() {
     Serial.print(greenFrequency);
     Serial.print(", B = ");
     Serial.println(blueFrequency);
+    }
   }
+ 
 
+ 
   /*
   if(redColor > greenColor && redColor > blueColor){
       Serial.println(" - RED detected!");
